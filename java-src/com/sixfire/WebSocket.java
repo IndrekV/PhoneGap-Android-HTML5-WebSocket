@@ -226,7 +226,7 @@ public class WebSocket {
 			buf.append((char)b);			
 		}
 
-		return new String(buf.toString().getBytes(), "UTF8");
+		return new String(buf.toString().getBytes("ISO-8859-1"), "UTF-8");
 	}
 	
 	/**
