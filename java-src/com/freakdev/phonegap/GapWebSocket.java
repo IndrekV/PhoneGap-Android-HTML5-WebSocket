@@ -34,7 +34,13 @@ import android.webkit.WebView;
 	protected void onmessage(final String data) {
 		mView.post(new Runnable(){
 			public void run() {
-				instance.execJS("WebSocket.triggerEvent(" + JSEvent.buildJSON("message", instance.toString(), data) + ")");
+				//instance.execJS("WebSocket.triggerEvent(" + JSEvent.buildJSON("message", instance.toString(), data) + ")");
+			
+				String js = "WebSocket.triggerEvent(" + JSEvent.buildJSON("message", instance.toString(), data) + ")";
+				synchronized(LOCK) {
+					if (mPendingJS.length() == 0) mPendingJS.append("javascript: ");
+					mPendingJS.append(js).append("; ");
+				}
 			}
 		});
 	}
@@ -52,7 +58,12 @@ import android.webkit.WebView;
 	@Override	
 	protected void onerror() {
 		try {
-			instance.execJS("javascript:WebSocket.triggerEvent(" + JSEvent.buildJSON("error", this.toString()) + ")");
+			//instance.execJS("javascript:WebSocket.triggerEvent(" + JSEvent.buildJSON("error", this.toString()) + ")");
+			String js = "WebSocket.triggerEvent(" + JSEvent.buildJSON("error", this.toString()) + ")";
+			synchronized(LOCK) {
+				if (mPendingJS.length() == 0) mPendingJS.append("javascript: ");
+				mPendingJS.append(js).append("; ");
+			}
 		} catch (Exception e) {
 			Log.i("WebSocketException", e.toString());
 			// TODO: handle exception
@@ -62,7 +73,12 @@ import android.webkit.WebView;
 	@Override
 	protected void onclose() {
 		try {
-			instance.execJS("javascript:WebSocket.triggerEvent(" + JSEvent.buildJSON("close", this.toString()) + ")");
+			//instance.execJS("javascript:WebSocket.triggerEvent(" + JSEvent.buildJSON("close", this.toString()) + ")");
+			String js = "WebSocket.triggerEvent(" + JSEvent.buildJSON("close", this.toString()) + ")";
+			synchronized(LOCK) {
+				if (mPendingJS.length() == 0) mPendingJS.append("javascript: ");
+				mPendingJS.append(js).append("; ");
+			}
 		} catch (Exception e) {
 			Log.i("WebSocketException", e.toString());
 			// TODO: handle exception
@@ -77,12 +93,12 @@ import android.webkit.WebView;
 		return this.readyState;
 	}	
 
-	public void execJS(String js) {
+/*	public void execJS(String js) {
 	    synchronized(LOCK) {
 	        if (mPendingJS.length() == 0) mPendingJS.append("javascript: ");
 	        mPendingJS.append(js).append("; ");
 	    }
-	}
+	}*/
 	
 	public String getPendingJS() {
 		try {
